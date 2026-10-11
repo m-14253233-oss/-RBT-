@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五年级设计与工艺 (RBT) 答题大闯关 [无重复真题版]</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            min-height: 100vh;
+            color: #f8fafc;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-bounce {
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .btn-bounce:hover {
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+        .btn-bounce:active {
+            transform: translateY(1px) scale(0.99);
+        }
+
+        .pulse-glow {
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(129, 140, 248, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(129, 140, 248, 0.8); }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.5);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.8);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Header Navigation -->
+    <header class="w-full glass-card sticky top-0 z-50 px-6 py-4 flex justify-between items-center border-b border-indigo-500/20">
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="showScreen('startScreen')">
+            <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-xl shadow-lg shadow-indigo-500/30">
+                🛠️
+            </div>
+            <div>
+                <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-pink-400 to-amber-300">
+                    五年级 RBT 答题大闯关
+                </h1>
+                <p class="text-xs text-indigo-300">根据 KSSR Semakan 课本编撰 · 60题无重复独立题库</p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-4">
+            <!-- Cloud Save Status Indicator -->
+            <div id="cloudStatusBadge" class="bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700 flex items-center space-x-1.5 text-xs">
+                <span id="cloudIcon" class="animate-pulse">☁️</span>
+                <span id="cloudStatusText" class="text-slate-300">云端准备中</span>
+            </div>
+
+            <div class="bg-slate-800/80 px-4 py-1.5 rounded-full border border-slate-700 flex items-center space-x-2">
+                <i class="fas fa-trophy text-amber-400 text-sm"></i>
+                <span class="text-sm font-semibold text-amber-200" id="totalScore">得分: 0</span>
+            </div>
+            <button onclick="toggleAudio()" id="audioBtn" class="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center border border-slate-700 text-slate-300 transition">
+                <i class="fas fa-volume-up text-indigo-400"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-4xl w-full mx-auto p-4 md:p-6 flex flex-col justify-center">
+
+        <!-- 1. Start / Home Screen -->
+        <section id="startScreen" class="glass-card rounded-3xl p-6 md:p-10 text-center space-y-8">
+            <div class="space-y-3">
+                <span class="px-4 py-1.5 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                    小学五年级设计与工艺 (RBT)
+                </span>
+                <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
+                    掌握专业技能，冲刺<span class="text-amber-400">RBT小霸王</span>！
+                </h2>
+                <p class="text-slate-300 max-w-xl mx-auto text-sm md:text-base">
+                    全面校对并扩充为 60 道完全独立的课本真题，绝无模板重复题！涵盖手缝针法、可更新能源、微控制器与都市农耕。
+                </p>
+            </div>
+
+            <!-- Dashboard Stats -->
+            <div class="grid grid-cols-3 gap-3 max-w-md mx-auto py-2">
+                <div class="bg-slate-800/60 p-3 rounded-2xl border border-slate-700/60">
+                    <div class="text-2xl font-bold text-indigo-400" id="statCompleted">0/4</div>
+                    <div class="text-xs text-slate-400">已通关卡</div>
+                </div>
+                <div class="bg-slate-800/60 p-3 rounded-2xl border border-slate-700/60">
+                    <div class="text-2xl font-bold text-amber-400" id="statStars">0</div>
+                    <div class="text-xs text-slate-400">获得星星</div>
+                </div>
+                <div class="bg-slate-800/60 p-3 rounded-2xl border border-slate-700/60">
+                    <div class="text-2xl font-bold text-emerald-400" id="statAccuracy">100%</div>
+                    <div class="text-xs text-slate-400">答案准确率</div>
+                </div>
+            </div>
+
+            <!-- Mode Selection Buttons -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl mx-auto pt-4">
+                <button onclick="startMode('stages')" class="btn-bounce bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white p-5 rounded-2xl font-bold text-lg flex items-center justify-between shadow-lg">
+                    <div class="flex items-center space-x-3 text-left">
+                        <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-2xl">🗺️</div>
+                        <div>
+                            <div>单元主题关卡</div>
+                            <div class="text-xs text-indigo-200 font-normal">分单元独立抽题（每关10题）</div>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+
+                <button onclick="startMode('challenge')" class="btn-bounce bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 text-white p-5 rounded-2xl font-bold text-lg flex items-center justify-between shadow-lg pulse-glow">
+                    <div class="flex items-center space-x-3 text-left">
+                        <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-2xl">🔥</div>
+                        <div>
+                            <div>全课程 60 题大挑战</div>
+                            <div class="text-xs text-amber-100 font-normal">全册综合随机乱序·限时冲榜</div>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <div class="flex justify-center space-x-4 pt-2">
+                <button onclick="showScreen('mistakesScreen')" class="text-xs text-indigo-300 hover:text-indigo-100 flex items-center space-x-1 py-1 px-3 rounded-lg bg-indigo-950/40 border border-indigo-800/40">
+                    <i class="fas fa-book-open"></i>
+                    <span>错题复习本 (<span id="mistakeCount">0</span>)</span>
+                </button>
+                <button onclick="resetProgress()" class="text-xs text-slate-400 hover:text-rose-300 flex items-center space-x-1 py-1 px-3">
+                    <i class="fas fa-rotate-right"></i>
+                    <span>重置进度</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- 2. Stage Map Screen -->
+        <section id="stagesScreen" class="glass-card rounded-3xl p-6 md:p-8 hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-bold text-white">单元主题关卡</h2>
+                    <p class="text-xs text-slate-300">请选择您要挑战的 RBT 知识单元</p>
+                </div>
+                <button onclick="showScreen('startScreen')" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 text-sm">
+                    <i class="fas fa-arrow-left mr-1"></i> 返回主页
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4" id="stageListContainer">
+                <!-- Dynamically Generated Stages -->
+            </div>
+        </section>
+
+        <!-- 3. Quiz / Gaming Screen -->
+        <section id="quizScreen" class="glass-card rounded-3xl p-6 md:p-8 hidden space-y-6">
+            <!-- Quiz Header Info Bar -->
+            <div class="flex justify-between items-center bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
+                <div class="flex items-center space-x-3">
+                    <span id="quizStageBadge" class="px-3 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white">
+                        单元 1
+                    </span>
+                    <span id="quizProgressText" class="text-sm font-semibold text-slate-300">
+                        第 1 / 10 题
+                    </span>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <!-- Lives (For Challenge Mode) -->
+                    <div id="livesContainer" class="flex items-center space-x-1 text-rose-500 text-sm">
+                        <i class="fas fa-heart"></i>
+                        <i class="fas fa-heart"></i>
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <!-- Timer -->
+                    <div id="timerContainer" class="flex items-center space-x-1.5 text-amber-400 text-sm font-mono font-bold bg-amber-950/40 px-3 py-1 rounded-lg border border-amber-800/40">
+                        <i class="fas fa-stopwatch"></i>
+                        <span id="timerText">20秒</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                <div id="progressBar" class="bg-gradient-to-r from-indigo-500 to-amber-400 h-full w-0 transition-all duration-300"></div>
+            </div>
+
+            <!-- Question Content -->
+            <div class="space-y-4">
+                <div class="text-xs text-indigo-400 font-semibold tracking-wider uppercase flex items-center space-x-2">
+                    <i class="fas fa-lightbulb"></i>
+                    <span id="questionCategory">缝纫基本知识</span>
+                </div>
+                <h3 id="questionText" class="text-lg md:text-xl font-bold text-white leading-relaxed min-h-[3rem]">
+                    题目载入中...
+                </h3>
+            </div>
+
+            <!-- Answer Options -->
+            <div id="optionsContainer" class="grid grid-cols-1 gap-3">
+                <!-- Dynamically populated option buttons -->
+            </div>
+
+            <!-- Lifelines & Hints -->
+            <div class="flex justify-between items-center pt-2 border-t border-slate-800">
+                <button id="hintBtn" onclick="useHint()" class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-xs text-amber-300 border border-slate-700 flex items-center space-x-1">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                    <span>查看提示 (扣除30分)</span>
+                </button>
+
+                <div class="text-xs text-slate-400">
+                    连胜: <span id="comboCounter" class="text-amber-400 font-bold">0</span> 🔥
+                </div>
+            </div>
+
+            <!-- Feedback / Rationale Drawer -->
+            <div id="explanationDrawer" class="hidden bg-slate-900/90 border border-indigo-500/30 p-4 rounded-2xl space-y-2">
+                <div class="flex items-center space-x-2 font-bold" id="explanationTitle">
+                    <i class="fas fa-info-circle"></i>
+                    <span>解析阐述</span>
+                </div>
+                <p id="explanationText" class="text-sm text-slate-300 leading-relaxed">
+                    解析内容...
+                </p>
+                <div class="pt-2 flex justify-end">
+                    <button onclick="nextQuestion()" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg flex items-center space-x-2">
+                        <span>下一题</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Result Screen -->
+        <section id="resultScreen" class="glass-card rounded-3xl p-6 md:p-10 text-center hidden space-y-6">
+            <div class="w-20 h-20 mx-auto rounded-full bg-amber-500/20 border-2 border-amber-400/50 flex items-center justify-center text-4xl shadow-xl">
+                🏆
+            </div>
+
+            <div class="space-y-2">
+                <h2 class="text-3xl font-extrabold text-white" id="resultTitle">挑战完成！</h2>
+                <p class="text-slate-300 text-sm" id="resultSubtitle">你对五年级 RBT 知识有了更深入的掌握！</p>
+            </div>
+
+            <!-- Stars Rating -->
+            <div class="flex justify-center space-x-3 text-3xl text-amber-400" id="resultStars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+            </div>
+
+            <!-- Score Summary Cards -->
+            <div class="grid grid-cols-3 gap-3 max-w-md mx-auto py-3">
+                <div class="bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
+                    <div class="text-xl font-bold text-indigo-400" id="resScore">0</div>
+                    <div class="text-xs text-slate-400">本次得分</div>
+                </div>
+                <div class="bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
+                    <div class="text-xl font-bold text-emerald-400" id="resAccuracy">0%</div>
+                    <div class="text-xs text-slate-400">正确率</div>
+                </div>
+                <div class="bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
+                    <div class="text-xl font-bold text-amber-400" id="resCombo">0</div>
+                    <div class="text-xs text-slate-400">最高连胜</div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-center space-x-4 pt-4">
+                <button onclick="showScreen('startScreen')" class="px-6 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm">
+                    返回主页
+                </button>
+                <button onclick="restartCurrentQuiz()" class="px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-bold text-sm shadow-lg">
+                    再挑战一次
+                </button>
+            </div>
+        </section>
+
+        <!-- 5. Mistakes Review Screen -->
+        <section id="mistakesScreen" class="glass-card rounded-3xl p-6 md:p-8 hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-bold text-white">错题复习本</h2>
+                    <p class="text-xs text-slate-300">针对薄弱知识点进行针对性复习</p>
+                </div>
+                <button onclick="showScreen('startScreen')" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 text-sm">
+                    <i class="fas fa-arrow-left mr-1"></i> 返回
+                </button>
+            </div>
+
+            <div id="mistakesList" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                <!-- Dynamically Filled -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Custom Modal -->
+    <div id="customModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+        <div class="glass-card rounded-3xl p-6 max-w-sm w-full space-y-4 text-center border border-indigo-500/30 shadow-2xl">
+            <div id="modalIcon" class="text-4xl">💡</div>
+            <h3 id="modalTitle" class="text-lg font-bold text-white">提示</h3>
+            <p id="modalMessage" class="text-sm text-slate-300 leading-relaxed"></p>
+            <div id="modalButtons" class="flex justify-center space-x-3 pt-2">
+                <!-- Buttons injected dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cloud storage sync setup
+        let db = null;
+        let auth = null;
+        let currentUser = null;
+        let isCloudReady = false;
+
+        async function initCloudStorage() {
+            try {
+                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js");
+                const { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
+                const { getFirestore, doc, setDoc, getDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+
+                const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+
+                if (!firebaseConfig) {
+                    updateCloudUI('offline', '本地模式');
+                    return;
+                }
+
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        currentUser = user;
+                        isCloudReady = true;
+                        updateCloudUI('online', `已同步云端`);
+                        await loadFromCloud();
+                    } else {
+                        updateCloudUI('offline', '本地存储');
+                    }
+                });
+            } catch (e) {
+                updateCloudUI('offline', '本地模式');
+            }
+        }
+
+        function updateCloudUI(state, text) {
+            const badge = document.getElementById('cloudStatusBadge');
+            const icon = document.getElementById('cloudIcon');
+            const label = document.getElementById('cloudStatusText');
+
+            if (state === 'online') {
+                badge.className = "bg-emerald-950/80 px-3 py-1.5 rounded-full border border-emerald-700/60 flex items-center space-x-1.5 text-xs text-emerald-300";
+                icon.innerText = "☁️";
+            } else if (state === 'saving') {
+                badge.className = "bg-amber-950/80 px-3 py-1.5 rounded-full border border-amber-700/60 flex items-center space-x-1.5 text-xs text-amber-300";
+                icon.innerText = "⏳";
+            } else {
+                badge.className = "bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700 flex items-center space-x-1.5 text-xs text-slate-400";
+                icon.innerText = "💾";
+            }
+            label.innerText = text;
+        }
+
+        async function saveToCloud() {
+            localStorage.setItem('rbt_mistakes', JSON.stringify(gameState.mistakes));
+            localStorage.setItem('rbt_stage_progress', JSON.stringify(gameState.stageProgress));
+
+            if (!isCloudReady || !currentUser || !db) return;
+
+            try {
+                updateCloudUI('saving', '同步中...');
+                const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'rbt-grade5-app';
+                const userDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'user_data', 'rbt_progress');
+
+                const totalScore = localStorage.getItem('rbt_total_score') || '0';
+
+                await setDoc(userDocRef, {
+                    stageProgress: gameState.stageProgress,
+                    totalScore: parseInt(totalScore),
+                    mistakes: gameState.mistakes,
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+
+                updateCloudUI('online', `已同步云端`);
+            } catch (err) {
+                updateCloudUI('offline', '本地保存');
+            }
+        }
+
+        async function loadFromCloud() {
+            if (!isCloudReady || !currentUser || !db) return;
+
+            try {
+                const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'rbt-grade5-app';
+                const userDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'user_data', 'rbt_progress');
+
+                const snap = await getDoc(userDocRef);
+                if (snap.exists()) {
+                    const data = snap.data();
+                    if (data.stageProgress) {
+                        gameState.stageProgress = data.stageProgress;
+                        localStorage.setItem('rbt_stage_progress', JSON.stringify(gameState.stageProgress));
+                    }
+                    if (data.totalScore !== undefined) {
+                        localStorage.setItem('rbt_total_score', data.totalScore.toString());
+                    }
+                    if (data.mistakes) {
+                        gameState.mistakes = data.mistakes;
+                        localStorage.setItem('rbt_mistakes', JSON.stringify(gameState.mistakes));
+                    }
+
+                    updateDashboardStats();
+                    renderStagesList();
+                    updateMistakeCount();
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function showCustomModal({ icon = '💡', title = '提示', message = '', confirmText = '确定', cancelText = null, onConfirm = null }) {
+            const modal = document.getElementById('customModal');
+            document.getElementById('modalIcon').innerText = icon;
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = message;
+
+            const btnContainer = document.getElementById('modalButtons');
+            btnContainer.innerHTML = '';
+
+            if (cancelText) {
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = "px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs";
+                cancelBtn.innerText = cancelText;
+                cancelBtn.onclick = () => modal.classList.add('hidden');
+                btnContainer.appendChild(cancelBtn);
+            }
+
+            const confirmBtn = document.createElement('button');
+            confirmBtn.className = "px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg";
+            confirmBtn.innerText = confirmText;
+            confirmBtn.onclick = () => {
+                modal.classList.add('hidden');
+                if (onConfirm) onConfirm();
+            };
+            btnContainer.appendChild(confirmBtn);
+
+            modal.classList.remove('hidden');
+        }
+
+        // Web Audio Synthesizer
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+        let isAudioMuted = false;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new AudioCtx();
+        }
+
+        function playSound(type) {
+            if (isAudioMuted) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1);
+                osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.exponentialRampToValueAtTime(130.81, now + 0.2);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, now);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            }
+        }
+
+        function toggleAudio() {
+            isAudioMuted = !isAudioMuted;
+            const btn = document.getElementById('audioBtn');
+            btn.innerHTML = isAudioMuted ? '<i class="fas fa-volume-mute text-slate-500"></i>' : '<i class="fas fa-volume-up text-indigo-400"></i>';
+        }
+
+        // =========================================================
+        // 60 道完全不重复的五年级 RBT 课本标准真题库 (每个单元15题)
+        // =========================================================
+        const unique60QuestionBank = [
+            // -------------------------------------------------------------
+            // 单元 1: 手缝针法与物品缝制 (15 题)
+            // -------------------------------------------------------------
+            {
+                stage: 1,
+                category: "单元1: 缝纫工具",
+                question: "套在中指上，用以在推针时保护手指免受针尾刺伤的工具是什么？",
+                options: [
+                    { text: "顶针", isCorrect: true, rationale: "正确！顶针戴在中指上，能保护手指不被针尾刺伤，并协助推针穿透厚布。" },
+                    { text: "拆线器", isCorrect: false, rationale: "错误。拆线器用于拆除缝错的线及开扣眼。" },
+                    { text: "穿线器", isCorrect: false, rationale: "错误。穿线器用于帮助将缝线穿过小针眼。" },
+                    { text: "缝纫粉块", isCorrect: false, rationale: "错误。缝纫粉块用于在布料上做标记。" }
+                ],
+                hint: "帽状或环状的小型护指金属或塑料套。"
+            },
+            {
+                stage: 1,
+                category: "单元1: 手缝针法",
+                question: "在缝制物品时，哪种针法最牢固，通常用于代替缝纫机缝合接缝？",
+                options: [
+                    { text: "回针缝", isCorrect: true, rationale: "正确！回针缝是手缝中最牢固的针法，外观与机器缝线相似，用于取代缝纫机或在开头和结尾做固定。" },
+                    { text: "粗缝 / 疏缝", isCorrect: false, rationale: "错误。粗缝针脚较宽，主要用于临时固定两层布料。" },
+                    { text: "锁扣缝 / 毯边缝", isCorrect: false, rationale: "错误。锁扣缝主要用于布料边缘锁边防脱线或作装饰。" },
+                    { text: "交叉缝", isCorrect: false, rationale: "错误。交叉缝主要用于固定裤脚或裙摆折边。" }
+                ],
+                hint: "这种针法向前一针再回退半针，针脚非常紧密牢固。"
+            },
+            {
+                stage: 1,
+                category: "单元1: 锁边针法",
+                question: "为了防止布料边缘的线头脱落毛散，最常使用的边缘锁边针法是什么？",
+                options: [
+                    { text: "锁扣缝", isCorrect: true, rationale: "正确！锁扣缝（Jahit Insang Pari）能锁紧布料边缘，防止脱线发毛，同时也具有美观装饰效果。" },
+                    { text: "细缝", isCorrect: false, rationale: "错误。细缝用于普通接缝，不具备锁边功能。" },
+                    { text: "回针缝", isCorrect: false, rationale: "错误。回针缝用于连接两片布料，无法包裹布边。" },
+                    { text: "树枝缝", isCorrect: false, rationale: "错误。树枝缝主要用于刺绣装饰图案。" }
+                ],
+                hint: "针脚成钩状锁住布料最外边缘。"
+            },
+            {
+                stage: 1,
+                category: "单元1: 临时固定",
+                question: "在正式缝合前，用来临时固定两片布料位置，防止滑动且随后容易拆除的针法是什么？",
+                options: [
+                    { text: "粗缝 / 疏缝", isCorrect: true, rationale: "正确！粗缝（Jahit Jelujur Kasar）针脚大而稀疏，能在正式缝合前起到临时固定作用。" },
+                    { text: "回针缝", isCorrect: false, rationale: "错误。回针缝非常紧密牢固，很难轻易拆除。" },
+                    { text: "锁扣缝", isCorrect: false, rationale: "错误。锁扣缝是边缘修饰与锁边针法。" },
+                    { text: "交叉缝", isCorrect: false, rationale: "错误。交叉缝常用于固定裤脚折边。" }
+                ],
+                hint: "针脚很长且宽大，临时固定后会拆除掉。"
+            },
+            {
+                stage: 1,
+                category: "单元1: 缝纫工具",
+                question: "测量身体尺寸或曲折布料长度时，最适合使用哪种测量工具？",
+                options: [
+                    { text: "皮尺 / 软尺", isCorrect: true, rationale: "正确！皮尺具有柔韧度，能贴合人体曲线或弯曲的布料边缘进行精准测量。" },
+                    { text: "直尺", isCorrect: false, rationale: "错误。硬质直尺无法弯曲测量曲线部分。" },
+                    { text: "钢卷尺", isCorrect: false, rationale: "错误。钢卷尺边缘较硬且锐利，容易划破布料。" },
+                    { text: "三角板", isCorrect: false, rationale: "错误。三角板用于画垂直线或角度。" }
+                ],
+                hint: "一种柔软可随意弯曲的长条测量尺。"
+            },
+            {
+                stage: 1,
+                category: "单元1: 工具安全",
+                question: "缝纫作业时，大头针和手缝针用完后应插入何处，以确保安全并防止丢失？",
+                options: [
+                    { text: "针垫", isCorrect: true, rationale: "正确！将针插在针垫上不仅方便取用，还能避免针尖朝外刺伤手部。" },
+                    { text: "桌面边角", isCorrect: false, rationale: "错误。针容易滚落地上刺伤脚部。" },
+                    { text: "笔盒内", isCorrect: false, rationale: "错误。翻找笔盒时容易被针尖扎伤。" },
+                    { text: "衣服袖口", isCorrect: false, rationale: "错误。极易刺伤皮肤造成危险。" }
+                ],
+                hint: "装有软棉花的小包状护针工具。"
+            },
+            {
+                stage: 1,
+                category: "单元1: 拆线与工具",
+                question: "缝错针脚需要拆除线头，或者需要在布料上开扣眼时，应使用什么工具？",
+                options: [
+                    { text: "拆线器", isCorrect: true, rationale: "正确！拆线器的小弯钩和微型刀片可以轻松挑断线头并开小扣眼。" },
+                    { text: "剪刀", isCorrect: false, rationale: "错误。大剪刀容易剪破周围布料。" },
+                    { text: "穿线器", isCorrect: false, rationale: "错误。穿线器仅用于将线穿入针眼。" },
+                    { text: "大头针", isCorrect: false, rationale: "错误。大头针容易钩伤布料纤维。" }
+                ],
+                hint: "头部带有小铁钩和微型小刃口的小型工具。"
+            },
+            {
+                stage: 1,
+                category: "单元1: 布料裁剪",
+                question: "裁剪布料时，为什么不能使用剪过纸张的旧剪刀？",
+                options: [
+                    { text: "剪纸会使剪刀刃口变钝，导致剪布时咬布发毛", isCorrect: true, rationale: "正确！剪纸容易磨损刀刃，钝剪刀剪布会导致边缘拉扯咬布不平整。" },
+                    { text: "剪纸后剪刀会带有毒性", isCorrect: false, rationale: "错误。剪纸不会产生毒性。" },
+                    { text: "剪刀会因此变重", isCorrect: false, rationale: "错误。重量不会改变。" },
+                    { text: "布料会变色", isCorrect: false, rationale: "错误。剪刀不会导致布料变色。" }
+                ],
+                hint: "与剪刀刃口的锋利程度有关。"
+            },
+            {
+                stage: 1,
+                category: "单元1: 穿线辅助",
+                question: "当缝线毛糙难以穿过较小的针眼时，可以使用什么辅助工具帮助穿线？",
+                options: [
+                    { text: "穿线器", isCorrect: true, rationale: "正确！穿线器上极细的钢丝圈能先穿过针眼，再将线引过针眼。" },
+                    { text: "顶针", isCorrect: false, rationale: "错误。顶针用于推针保护手指。" },
+                    { text: "缝纫粉块", isCorrect: false, rationale: "错误。粉块用于在布料上标记。" },
+                    { text: "大头针", isCorrect: false, rationale: "错误。大头针无法协助穿线。" }
+                ],
+                hint: "带有小菱形细钢丝的小铁片工具。"
+            },
+            {
+                stage: 1,
+                category: "单元1: 划线标记",
+                question: "在布料上画缝制线条或做图案标记时，最适合使用什么不会破坏布料的标记工具？",
+                options: [
+                    { text: "缝纫粉块", isCorrect: true, rationale: "正确！缝纫粉块（Kapur Tukang Jahit）标记清晰且成品完成后极易拍落清干净。" },
+                    { text: "圆珠笔", isCorrect: false, rationale: "错误。圆珠笔油墨很难洗掉，会弄脏成品。" },
+                    { text: "彩色水笔", isCorrect: false, rationale: "错误。水笔晕染会渗透损坏布料。" },
+                    { text: "油漆笔", isCorrect: false, rationale: "错误。油漆笔会永久损坏布料。" }
+                ],
+                hint: "一种可以轻易拍掉或洗掉的特制彩色粉块。"
+            },
+            {
+                stage: 1,
+                category: "单元1: 折边针法",
+                question: "用于固定裤脚、裙摆等折边，且正面几乎看不到针脚痕迹的针法是什么？",
+                options: [
+                    { text: "交叉缝", isCorrect: true, rationale: "正确！交叉缝（Jahit Silang Pangkah）常用于衣物折边固定，兼具弹性和隐蔽性。" },
+                    { text: "粗缝", isCorrect: false, rationale: "错误。粗缝只是临时固定线。" },
+                    { text: "回针缝", isCorrect: false, rationale: "错误。回针缝针脚过于明显。" },
+                    { text: "平针缝", isCorrect: false, rationale: "错误。平针缝用于普通缝合。" }
+                ],
+                hint: "针脚形成“X”交叉形状的针法。"
+            },
+            {
+                stage: 1,
+                category: "单元1: 缝制步骤",
+                question: "制作手缝小物品（如手帕或笔袋）时，第一步应该做什么？",
+                options: [
+                    { text: "确定物品主题并绘制设计草图", isCorrect: true, rationale: "正确！设计是制作的第一步，先绘制草图并确定尺寸与材料后才能开工。" },
+                    { text: "直接用剪刀剪布", isCorrect: false, rationale: "错误。没画好草图和尺寸盲目剪布容易浪费材料。" },
+                    { text: "将线穿入针眼里打结", isCorrect: false, rationale: "错误。尚未确定设计与裁剪。" },
+                    { text: "用顶针推针", isCorrect: false, rationale: "错误。这是缝制过程中的动作。" }
+                ],
+                hint: "在动剪刀和缝针之前，必须先有规划与构思。"
+            },
+            {
+                stage: 1,
+                category: "单元1: 装饰配件",
+                question: "下列哪项不属于手缝物品常见的功能性或装饰性辅料？",
+                options: [
+                    { text: "水泥钉", isCorrect: true, rationale: "正确！水泥钉属于建筑与木工五金，不用于缝纫。" },
+                    { text: "纽扣", isCorrect: false, rationale: "错误。纽扣是常见的缝纫固定与装饰件。" },
+                    { text: "魔术贴", isCorrect: false, rationale: "错误。魔术贴常用于封口黏合。" },
+                    { text: "拉链", isCorrect: false, rationale: "错误。拉链是袋口常用的开合配件。" }
+                ],
+                hint: "一种用来钉墙壁的硬金属钉。"
+            },
+            {
+                stage: 1,
+                category: "单元1: 结尾固定",
+                question: "手缝结束时，打结固定的主要目的是什么？",
+                options: [
+                    { text: "防止线头松脱导致缝线解体", isCorrect: true, rationale: "正确！末端打结能卡住布料纤维，确保缝好的针脚不会散开。" },
+                    { text: "让布料变得更柔软", isCorrect: false, rationale: "错误。打结与布料软硬无关。" },
+                    { text: "改变线的颜色", isCorrect: false, rationale: "错误。打结不会改变线色。" },
+                    { text: "增加布料厚度", isCorrect: false, rationale: "错误。打结只是为了固定末端。" }
+                ],
+                hint: "防止缝好的部分重新散掉。"
+            },
+            {
+                stage: 1,
+                category: "单元1: 针法安全",
+                question: "缝纫时如果针尖不慎刺伤手指出血，正确的应急处理步骤是什么？",
+                options: [
+                    { text: "立即停止作业，清洗伤口并用消毒贴挤压止血", isCorrect: true, rationale: "正确！优先卫生止血并告知老师或家长处理。" },
+                    { text: "用布料包住继续缝制", isCorrect: false, rationale: "错误。容易造成伤口感染并弄脏布料。" },
+                    { text: "把伤口按在桌面上", isCorrect: false, rationale: "错误。桌面细菌多容易引发感染。" },
+                    { text: "不予理睬继续推针", isCorrect: false, rationale: "错误。忽视伤口有破伤风风险。" }
+                ],
+                hint: "卫生消毒止血并寻求协助。"
+            },
+
+            // -------------------------------------------------------------
+            // 单元 2: 无限的可更新能源 (15 题)
+            // -------------------------------------------------------------
+            {
+                stage: 2,
+                category: "单元2: 能源定义",
+                question: "下列哪项关于“可更新能源”的说明是正确的？",
+                options: [
+                    { text: "来自自然界且源源不断、可以不断补充和再生的清洁能源", isCorrect: true, rationale: "正确！可更新能源是指自然界中用之不竭、在使用后能自动再生的能源，且环境污染极低。" },
+                    { text: "用完之后短时间内无法再补充的石油和煤炭能源", isCorrect: false, rationale: "错误。石油和煤炭属于不可更新能源。" },
+                    { text: "只能使用一次就会完全耗尽的能源", isCorrect: false, rationale: "错误。可更新能源可以不断循环使用和补充。" },
+                    { text: "造成严重新温室效应与空气污染的能源", isCorrect: false, rationale: "错误。可更新能源多为环保无污染能源。" }
+                ],
+                hint: "想想太阳光和风力，它们会被我们用光吗？"
+            },
+            {
+                stage: 2,
+                category: "单元2: 能源分类",
+                question: "下列哪组完全属于“可更新能源”的来源？",
+                options: [
+                    { text: "太阳能、风能、水力能、生物质能", isCorrect: true, rationale: "正确！太阳、风、水流和生物质都是典型的可更新能源来源。" },
+                    { text: "石油、煤炭、天然气", isCorrect: false, rationale: "错误。这些均为会耗尽的化石燃料（不可更新能源）。" },
+                    { text: "核能、柴油、汽油", isCorrect: false, rationale: "错误。柴油和汽油均来自不可更新的石油。" },
+                    { text: "天然气、煤炭、太阳能", isCorrect: false, rationale: "错误。天然气和煤炭属于不可更新能源。" }
+                ],
+                hint: "找出一项全是由自然风水日光构成的选项。"
+            },
+            {
+                stage: 2,
+                category: "单元2: 太阳能转换",
+                question: "太阳能电池板在可更新能源产品中的核心转换功能是什么？",
+                options: [
+                    { text: "把太阳的光能转换为电能", isCorrect: true, rationale: "正确！太阳能电池板吸收太阳光能，并将其转化储存为可使用的电能。" },
+                    { text: "把风能转换为机械动能", isCorrect: false, rationale: "错误。这是风力发电机的作用。" },
+                    { text: "把化学能转换为热能", isCorrect: false, rationale: "错误。太阳能电池板不依靠化学燃烧。" },
+                    { text: "把水流落差转换为风力", isCorrect: false, rationale: "错误。水流转换属于水力发电机。" }
+                ],
+                hint: "它能吸收阳光并给电机供电。"
+            },
+            {
+                stage: 2,
+                category: "单元2: 生物质能",
+                question: "利用动植物废弃物、木屑或农业有机垃圾发酵产生沼气来发电的能源称为什么？",
+                options: [
+                    { text: "生物质能", isCorrect: true, rationale: "正确！生物质能是从有机物（动植物排泄物、农作物废料）中获取的可更新能源。" },
+                    { text: "地热能", isCorrect: false, rationale: "错误。地热能来自于地球内部的热量。" },
+                    { text: "波浪能", isCorrect: false, rationale: "错误。波浪能来自于海洋波浪起伏。" },
+                    { text: "水力能", isCorrect: false, rationale: "错误。水力来自于江河水流落差。" }
+                ],
+                hint: "与生物、动植物废料有关的能源名词。"
+            },
+            {
+                stage: 2,
+                category: "单元2: 动能转换元件",
+                question: "在制作太阳能小车模型时，用来把电能转换为机械旋转动能以带动车轮旋转的元件是什么？",
+                options: [
+                    { text: "电动机 / 马达", isCorrect: true, rationale: "正确！电动机（马达）能将输入的电能转化为旋转的机械动能，带动齿轮或车轮转动。" },
+                    { text: "开关", isCorrect: false, rationale: "错误。开关用于控制电路的接通与断开。" },
+                    { text: "发光二极管 (LED)", isCorrect: false, rationale: "错误。LED 用于发出光线。" },
+                    { text: "蜂鸣器", isCorrect: false, rationale: "错误。蜂鸣器用于发出声音警报。" }
+                ],
+                hint: "通电后能够旋转带动轮子的动力零件。"
+            },
+            {
+                stage: 2,
+                category: "单元2: 水力发电",
+                question: "大型水坝利用高处积水向低处流下时的什么能量来冲击水轮机发电？",
+                options: [
+                    { text: "水流落差产生的动能与势能", isCorrect: true, rationale: "正确！水坝利用高水位落差产生的巨大水流冲击力带动发电机运转。" },
+                    { text: "水中的化学燃烧能", isCorrect: false, rationale: "错误。水不能燃烧。" },
+                    { text: "阳光反射能", isCorrect: false, rationale: "错误。水力发电与阳光反射无关。" },
+                    { text: "地壳震动能", isCorrect: false, rationale: "错误。地壳震动属于地震波。" }
+                ],
+                hint: "水从高处往低处冲下来的力量。"
+            },
+            {
+                stage: 2,
+                category: "单元2: 风力发电",
+                question: "风力发电机通常安装在风力大且持续的平原或沿海，它是通过什么带动发电机旋转的？",
+                options: [
+                    { text: "流动空气吹动巨大风车叶片", isCorrect: true, rationale: "正确！风吹动叶片旋转，带动内部发电机转子切割磁感线产生电能。" },
+                    { text: "太阳炙烤风车", isCorrect: false, rationale: "错误。热量无法直接推转叶片。" },
+                    { text: "雨水砸击叶片", isCorrect: false, rationale: "错误。风力发电机不依赖下雨。" },
+                    { text: "燃气推力", isCorrect: false, rationale: "错误。风力发电不消耗燃料。" }
+                ],
+                hint: "自然界中大风吹过风车的效果。"
+            },
+            {
+                stage: 2,
+                category: "单元2: 不可更新能源",
+                question: "为什么石油、煤炭和天然气被称为“不可更新能源”？",
+                options: [
+                    { text: "形成需要数百万年，消耗速度远快于再生速度且储量有限", isCorrect: true, rationale: "正确！化石燃料需要极其漫长的地质演变才能形成，用完后无法短期再生。" },
+                    { text: "因为它们完全不会对环境造成污染", isCorrect: false, rationale: "错误。化石燃料燃烧会造成严重污染。" },
+                    { text: "因为它们随时随地可以在实验室合成", isCorrect: false, rationale: "错误。化石燃料无法快速人工合成。" },
+                    { text: "因为它们的能源效率为零", isCorrect: false, rationale: "错误。化石燃料能量密度较高。" }
+                ],
+                hint: "用一点少一点，用完后无法在人类有生之年恢复。"
+            },
+            {
+                stage: 2,
+                category: "单元2: 环保效益",
+                question: "人类大力推广使用可更新能源的最主要环保原因是：",
+                options: [
+                    { text: "减少二氧化碳等温室气体排放，缓解全球气候变暖", isCorrect: true, rationale: "正确！使用清洁的可更新能源能有效减少温室气体排放，保护地球环境。" },
+                    { text: "可以完全替代世界上所有的食物", isCorrect: false, rationale: "错误。能源不能代替食物。" },
+                    { text: "可以停止大气的流动", isCorrect: false, rationale: "错误。大气流动是自然现象。" },
+                    { text: "能阻止海水潮汐运动", isCorrect: false, rationale: "错误。潮汐受月球引力控制。" }
+                ],
+                hint: "减少燃烧产生的烟尘和温室气体。"
+            },
+            {
+                stage: 2,
+                category: "单元2: 地热能",
+                question: "从地球内部深处获取的热水或蒸汽来发电或供暖的能量称为什么？",
+                options: [
+                    { text: "地热能", isCorrect: true, rationale: "正确！地热能（Tenaga Geoterma）来自于地球内部岩浆与地热层的热量。" },
+                    { text: "风能", isCorrect: false, rationale: "错误。风能来自空气流动。" },
+                    { text: "波浪能", isCorrect: false, rationale: "错误。波浪能来自海洋表层。" },
+                    { text: "太阳能", isCorrect: false, rationale: "错误。太阳能来自恒星太阳辐射。" }
+                ],
+                hint: "名称中带有“地”和“热”的能源。"
+            },
+            {
+                stage: 2,
+                category: "单元2: 电路控制元件",
+                question: "在组装太阳能模型车时，能够人工控制电路断开与闭合的元件是什么？",
+                options: [
+                    { text: "开关", isCorrect: true, rationale: "正确！开关用于控制电路的接通（导通）与断开（停止）。" },
+                    { text: "齿轮", isCorrect: false, rationale: "错误。齿轮用于传动与改变转速。" },
+                    { text: "车轮", isCorrect: false, rationale: "错误。车轮用于行走支撑。" },
+                    { text: "太阳能板", isCorrect: false, rationale: "错误。太阳能板是电源。" }
+                ],
+                hint: "手按下时通电，弹起时断电。"
+            },
+            {
+                stage: 2,
+                category: "单元2: 机械传动",
+                question: "太阳能模型马达轴心上安装的小齿轮带动车轴上的大齿轮旋转，主要作用是什么？",
+                options: [
+                    { text: "传递动力并改变转速或扭矩", isCorrect: true, rationale: "正确！齿轮啮合可以传递旋转运动，并通过齿数比调节车轮的转速和推力。" },
+                    { text: "产生光线", isCorrect: false, rationale: "错误。齿轮不发光。" },
+                    { text: "储存电能", isCorrect: false, rationale: "错误。电池或电容才储存电能。" },
+                    { text: "增加空气阻力", isCorrect: false, rationale: "错误。齿轮传动不是为了增加阻力。" }
+                ],
+                hint: "两个互相咬合带齿的圆盘。"
+            },
+            {
+                stage: 2,
+                category: "单元2: 能源应用",
+                question: "马路边的“太阳能路灯”在白天和黑夜的工作原理是怎样的？",
+                options: [
+                    { text: "白天太阳能板吸收光能转化为电能存在电池里，夜晚电池给灯供电", isCorrect: true, rationale: "正确！白天光伏转换蓄电，晚上无光时蓄电池向 LED 灯泡放电发光。" },
+                    { text: "白天直接点亮，晚上吸收月光发光", isCorrect: false, rationale: "错误。月光能量太弱无法供发电。" },
+                    { text: "白天依靠柴油发电机，晚上靠太阳能", isCorrect: false, rationale: "错误。太阳能路灯不依赖柴油。" },
+                    { text: "全天依靠风力推拉", isCorrect: false, rationale: "错误。太阳能路灯以太阳光为主。" }
+                ],
+                hint: "白天存电，晚上放电发光。"
+            },
+            {
+                stage: 2,
+                category: "单元2: 海洋能源",
+                question: "利用海洋表面波浪起伏的机械运动来推动发电机发电的能源称为：",
+                options: [
+                    { text: "波浪能 / 海浪能", isCorrect: true, rationale: "正确！波浪能是利用海洋波浪的上下起伏动能转化为电能的清洁能源。" },
+                    { text: "生物质能", isCorrect: false, rationale: "错误。生物质能来自有机物发酵。" },
+                    { text: "煤炭能", isCorrect: false, rationale: "错误。煤炭属于不可更新矿产。" },
+                    { text: "核能", isCorrect: false, rationale: "错误。核能来自原子核裂变。" }
+                ],
+                hint: "与大海海浪起伏有关。"
+            },
+            {
+                stage: 2,
+                category: "单元2: 测试与故障排查",
+                question: "阳光充足时，组装好的太阳能小车却无法运转，最不可能的原因是：",
+                options: [
+                    { text: "太阳光强度太强", isCorrect: true, rationale: "正确！阳光越强太阳能板发电效率通常越高，因此光强不会导致小车不转。" },
+                    { text: "电路连接松脱或断路", isCorrect: false, rationale: "错误。电路断开会导致小车不动。" },
+                    { text: "马达齿轮卡死", isCorrect: false, rationale: "错误。齿轮卡死会导致马达无法旋转。" },
+                    { text: "开关处于关闭状态", isCorrect: false, rationale: "错误。开关断开时没有电流。" }
+                ],
+                hint: "太阳能板最喜欢强光照射。"
+            },
+
+            // -------------------------------------------------------------
+            // 单元 3: 程序设计与微型控制器 (15 题)
+            // -------------------------------------------------------------
+            {
+                stage: 3,
+                category: "单元3: 流程图符号",
+                question: "在程序流程图（Carta Alir）中，菱形符号代表什么功能？",
+                options: [
+                    { text: "条件判断 / 决策", isCorrect: true, rationale: "正确！菱形框用于进行条件判断（如“是否按下按键”），根据“是”或“否”决定分支路线。" },
+                    { text: "程序开始或结束", isCorrect: false, rationale: "错误。开始或结束使用圆角矩形或椭圆形。" },
+                    { text: "普通处理过程", isCorrect: false, rationale: "错误。处理过程使用普通矩形。" },
+                    { text: "数据输入或输出", isCorrect: false, rationale: "错误。输入与输出使用平行四边形。" }
+                ],
+                hint: "当程序出现“如果...就...”分支时使用的图形。"
+            },
+            {
+                stage: 3,
+                category: "单元3: 流程图符号",
+                question: "流程图中代表“程序开始”或“程序结束”的标准化图形是什么？",
+                options: [
+                    { text: "圆角矩形 / 椭圆形", isCorrect: true, rationale: "正确！椭圆或圆角矩形是流程图的端点符号，标识程序起始与终点。" },
+                    { text: "平行四边形", isCorrect: false, rationale: "错误。平行四边形代表数据输入/输出。" },
+                    { text: "菱形", isCorrect: false, rationale: "错误。菱形代表条件判断。" },
+                    { text: "正三角形", isCorrect: false, rationale: "错误。标准流程图中无正三角形。" }
+                ],
+                hint: "放在流程图最顶端和最底部的圆润框。"
+            },
+            {
+                stage: 3,
+                category: "单元3: 流程图符号",
+                question: "在流程图中，矩形（长方形）符号用来表示什么？",
+                options: [
+                    { text: "处理 / 执行操作命令", isCorrect: true, rationale: "正确！矩形代表具体的处理步骤或计算操作（例如：LED灯闪烁1秒）。" },
+                    { text: "判断逻辑是否正确", isCorrect: false, rationale: "错误。判断逻辑用菱形。" },
+                    { text: "开始运行程序", isCorrect: false, rationale: "错误。开始用圆角矩形。" },
+                    { text: "连接不同页面的线条", isCorrect: false, rationale: "错误。跨页连接用圆圈。" }
+                ],
+                hint: "用来放置具体动作指令的普通方框。"
+            },
+            {
+                stage: 3,
+                category: "单元3: 微控制器输入元件",
+                question: "在微型控制器（如 Micro:bit）项目中，下列哪项属于“输入元件”（Input Component）？",
+                options: [
+                    { text: "光敏传感器", isCorrect: true, rationale: "正确！光敏传感器检测外界光线强弱并转化为电信号传给控制器，属于输入设备。" },
+                    { text: "蜂鸣器", isCorrect: false, rationale: "错误。蜂鸣器发声，属于输出设备。" },
+                    { text: "LED 点阵屏", isCorrect: false, rationale: "错误。LED 显示图像，属于输出设备。" },
+                    { text: "伺服马达", isCorrect: false, rationale: "错误。马达产生机械旋转，属于输出设备。" }
+                ],
+                hint: "负责感知外界环境物理量的元件。"
+            },
+            {
+                stage: 3,
+                category: "单元3: 微控制器输出元件",
+                question: "下列哪项属于微型控制器的“输出元件”（Output Component）？",
+                options: [
+                    { text: "蜂鸣器", isCorrect: true, rationale: "正确！蜂鸣器接收控制器的指令并发出声音警报，属于声音输出设备。" },
+                    { text: "按钮 A/B", isCorrect: false, rationale: "错误。按钮是人工按压输入信号的输入设备。" },
+                    { text: "温度传感器", isCorrect: false, rationale: "错误。温度传感器检测环境温度输入信号。" },
+                    { text: "声音传感器", isCorrect: false, rationale: "错误。声音传感器检测外界噪音输入信号。" }
+                ],
+                hint: "能产生声音、光线或动作响应的元件。"
+            },
+            {
+                stage: 3,
+                category: "单元3: 算法定义",
+                question: "关于“算法”（Algoritma）的定义，下列哪项说明最为准确？",
+                options: [
+                    { text: "为解决某一特定问题而制定的有步骤、明确的指令集合", isCorrect: true, rationale: "正确！算法是解决问题或完成任务的逻辑步骤与规则序列。" },
+                    { text: "微型控制器内部的物理硬件电路板", isCorrect: false, rationale: "错误。硬件电路不叫算法。" },
+                    { text: "一种用来切割木头的小型机械工具", isCorrect: false, rationale: "错误。这是木工工具。" },
+                    { text: "电脑显示器的屏幕像素点", isCorrect: false, rationale: "错误。屏幕像素与算法概念无关。" }
+                ],
+                hint: "解决问题的一步一步的思考方法与步骤。"
+            },
+            {
+                stage: 3,
+                category: "单元3: 伪代码",
+                question: "用结合了自然语言和编程语言关键词来描述程序逻辑步骤的文本表达方式称为什么？",
+                options: [
+                    { text: "伪代码 / 伪码", isCorrect: true, rationale: "正确！伪代码（Pseudokod）是用通俗语言配合程序逻辑关键字（如 MULA、IF、TAMAT）书写的文字流程。" },
+                    { text: "机器码", isCorrect: false, rationale: "错误。机器码是二进制0和1代码。" },
+                    { text: "三维草图", isCorrect: false, rationale: "错误。三维草图是画图图形。" },
+                    { text: "电路拓扑图", isCorrect: false, rationale: "错误。电路图展示硬件连线。" }
+                ],
+                hint: "介于人类语言与计算机编程语言之间的文字描述。"
+            },
+            {
+                stage: 3,
+                category: "单元3: 结构控制",
+                question: "程序“逐行按顺序依次执行，没有跳跃也没有重复”的结构称为什么结构？",
+                options: [
+                    { text: "顺序结构", isCorrect: true, rationale: "正确！顺序结构（Kawalan Urutan）是程序最基本的由上至下按顺序执行的结构。" },
+                    { text: "选择结构", isCorrect: false, rationale: "错误。选择结构会根据条件分支判断。" },
+                    { text: "循环结构", isCorrect: false, rationale: "错误。循环结构会重复执行某段代码。" },
+                    { text: "平行结构", isCorrect: false, rationale: "错误。非常规基本程序结构。" }
+                ],
+                hint: "像排队一样，一步接着一步顺着往下走。"
+            },
+            {
+                stage: 3,
+                category: "单元3: 逻辑条件",
+                question: "程序中的“如果按下按键 A，则蜂鸣器响；否则蜂鸣器安静”，这属于什么结构？",
+                options: [
+                    { text: "单选择 / 分支结构", isCorrect: true, rationale: "正确！根据“按下按键与否”的条件做出选择分支（Kawalan Pilihan）。" },
+                    { text: "死循环结构", isCorrect: false, rationale: "错误。这不是无限重复。" },
+                    { text: "顺序结构", isCorrect: false, rationale: "错误。含有条件判断分支不属于纯顺序。" },
+                    { text: "倒序结构", isCorrect: false, rationale: "错误。程序不会倒着运行。" }
+                ],
+                hint: "含有“如果...否则...”判断的结构。"
+            },
+            {
+                stage: 3,
+                category: "单元3: Micro:bit 显示",
+                question: "Micro:bit 微型控制器正面配备的 5x5 LED 阵列的主要用途是什么？",
+                options: [
+                    { text: "显示图案、数字、字母及动画效果", isCorrect: true, rationale: "正确！5x5 的 25 颗 LED 灯可以通过编程发光，组成各种视觉输出符号。" },
+                    { text: "吸收太阳能发电", isCorrect: false, rationale: "错误。LED 是发光器件，不是发电机。" },
+                    { text: "测量环境湿度", isCorrect: false, rationale: "错误。LED 不能测湿度。" },
+                    { text: "做电机旋转转轴", isCorrect: false, rationale: "错误。LED 是固定的电子元件。" }
+                ],
+                hint: "由 25 颗小红色发光二极管组成的点阵屏。"
+            },
+            {
+                stage: 3,
+                category: "单元3: 伺服马达应用",
+                question: "伺服马达（Servo Motor）与普通电机相比，最显著的功能特点是什么？",
+                options: [
+                    { text: "可以精准控制旋转的角度（如 0° 到 180°）", isCorrect: true, rationale: "正确！伺服马达能根据信号精确转动并停在特定角度，常用于机械臂或智能闸门。" },
+                    { text: "只能以极高转速无限旋转", isCorrect: false, rationale: "错误。这是普通马达的特点。" },
+                    { text: "不需要消耗任何电能", isCorrect: false, rationale: "错误。伺服马达需要供电才能工作。" },
+                    { text: "能直接发出高音贝警报", isCorrect: false, rationale: "错误。发声是蜂鸣器的功能。" }
+                ],
+                hint: "能够按照指令转到指定的精准角度（如挡风杆升起90度）。"
+            },
+            {
+                stage: 3,
+                category: "单元3: 三维草图投影",
+                question: "绘制等边投影草图（Lakaran Isometrik）时，两条左右倾斜的退深基准轴与水平线的夹角是多少度？",
+                options: [
+                    { text: "左右各 30 度", isCorrect: true, rationale: "正确！等边投影图的两条倾斜基准轴与水平线呈 30° 角。" },
+                    { text: "退深轴 45 度", isCorrect: false, rationale: "错误。45° 是斜投影图（Lakaran Oblik）的退深轴角度。" },
+                    { text: "左右各 60 度", isCorrect: false, rationale: "错误。非标准等边投影角度。" },
+                    { text: "垂直 90 度", isCorrect: false, rationale: "错误。90° 是垂直高轴角度。" }
+                ],
+                hint: "左右对称倾斜，角度为 30 度。"
+            },
+            {
+                stage: 3,
+                category: "单元3: 三维草图类型",
+                question: "正面保持真实形状，退深轴与水平线成 45° 倾斜角绘制的三维草图称为什么？",
+                options: [
+                    { text: "斜投影图 / 45度斜透视图", isCorrect: true, rationale: "正确！斜投影图（Lakaran Oblik）的特征是正面不倾斜，侧边深轴倾斜 45°。" },
+                    { text: "等边投影图", isCorrect: false, rationale: "错误。等边投影图左右轴均呈 30° 倾斜。" },
+                    { text: "透视图", isCorrect: false, rationale: "错误。透视图含有消失点。" },
+                    { text: "平面展开图", isCorrect: false, rationale: "错误。展开图是二维平面图。" }
+                ],
+                hint: "倾斜角度为 45 度的草图名称。"
+            },
+            {
+                stage: 3,
+                category: "单元3: 流程图箭头",
+                question: "在流程图（Carta Alir）中，连接各个图形框的“箭头”起什么作用？",
+                options: [
+                    { text: "指示程序的执行顺序与数据流动方向", isCorrect: true, rationale: "正确！箭头指明了程序从上一个步骤通往下一个步骤的逻辑流向。" },
+                    { text: "代表画图的长度", isCorrect: false, rationale: "错误。箭头长度无物理尺寸意义。" },
+                    { text: "表示电源的通电电压", isCorrect: false, rationale: "错误。流程图不是电路图。" },
+                    { text: "装饰美化页面", isCorrect: false, rationale: "错误。箭头具有严格的逻辑功能。" }
+                ],
+                hint: "指引程序下一步该走到哪里。"
+            },
+            {
+                stage: 3,
+                category: "单元3: 编程调试",
+                question: "把编写好的程序下载并刷入微型控制器之前，在电脑软件上进行“模拟运行测试”的主要目的是：",
+                options: [
+                    { text: "检查程序逻辑是否有错误或漏洞并及时修正", isCorrect: true, rationale: "正确！在软件模拟器中测试可以提前发现错误逻辑，避免损坏实物硬件。" },
+                    { text: "增加控制器的内存容量", isCorrect: false, rationale: "错误。软件测试不能改变硬件内存。" },
+                    { text: "清理电脑的缓存垃圾", isCorrect: false, rationale: "错误。与电脑清理无直接关系。" },
+                    { text: "改变微控制器的外壳颜色", isCorrect: false, rationale: "错误。软件无法改变物理外壳。" }
+                ],
+                hint: "在实物运行前先检查程序有没有 Bug。"
+            },
+
+            // -------------------------------------------------------------
+            // 单元 4: 绿意生机与都市农耕 (15 题)
+            // -------------------------------------------------------------
+            {
+                stage: 4,
+                category: "单元4: 芯吸水培原理",
+                question: "在芯吸水培系统（Sistem Sumbu）中，营养液依靠什么物理现象通过吸水棉绳输送到植物根部？",
+                options: [
+                    { text: "毛细现象", isCorrect: true, rationale: "正确！棉绳利用毛细现象（Tindakan Kapilari）将底部水槽的液体自动吸向上方的种植介质和根部。" },
+                    { text: "高压水泵抽吸", isCorrect: false, rationale: "错误。芯吸系统属于无水泵的被动蓄水系统。" },
+                    { text: "重力自然下漏", isCorrect: false, rationale: "错误。液体是从下往上被吸收的，克服了重力。" },
+                    { text: "风力吹送", isCorrect: false, rationale: "错误。风力不能输送水槽里的营养液。" }
+                ],
+                hint: "类似油灯灯芯吸油或纸巾吸水漫延的物理现象。"
+            },
+            {
+                stage: 4,
+                category: "单元4: 营养液配制",
+                question: "无土水培种植中，常用的浓缩营养液通常分为哪两种，需按比例兑水稀释使用？",
+                options: [
+                    { text: "AB 浓缩营养液", isCorrect: true, rationale: "正确！无土栽培常用 AB 浓缩营养液，包含了植物生长必需的大量和微量营养元素。" },
+                    { text: "甲乙酒精液", isCorrect: false, rationale: "错误。酒精会烧死植物根部。" },
+                    { text: "红蓝高锰酸钾液", isCorrect: false, rationale: "错误。高锰酸钾是消毒剂。" },
+                    { text: "黑白洗涤剂", isCorrect: false, rationale: "错误。洗涤剂会破坏植物细胞。" }
+                ],
+                hint: "使用英文字母 A 和 B 命名的专用液体肥料。"
+            },
+            {
+                stage: 4,
+                category: "单元4: 无土介质",
+                question: "在无土栽培播种发芽阶段，最常用来固定种子并具有良好吸水保水性能的介质是什么？",
+                options: [
+                    { text: "海绵 / 岩棉", isCorrect: true, rationale: "正确！海绵质地柔软、透气保水，且切口方便固定种子萌发与幼苗立足。" },
+                    { text: "硬水泥块", isCorrect: false, rationale: "错误。水泥块硬且不透气，幼苗无法扎根。" },
+                    { text: "铁丝网", isCorrect: false, rationale: "错误。铁丝网无法吸水保湿。" },
+                    { text: "塑料碎块", isCorrect: false, rationale: "错误。塑料不具备吸水保湿能力。" }
+                ],
+                hint: "一种有许多小孔、吸水后很湿润柔软的方块。"
+            },
+            {
+                stage: 4,
+                category: "单元4: 都市农耕优势",
+                question: "在空间有限的居住区（如高楼公寓）推行“都市农耕”（Pertanian Bandar）的最大优势是什么？",
+                options: [
+                    { text: "善用有限的阳台或小空间，生产新鲜无公害蔬菜", isCorrect: true, rationale: "正确！都市农耕打破了传统大面积农田限制，利用立体空间自给自足。" },
+                    { text: "可以完全不需要阳光和水", isCorrect: false, rationale: "错误。植物生长依然需要光合作用与水分。" },
+                    { text: "能产生大量的工业重金属", isCorrect: false, rationale: "错误。都市农耕旨在生产绿色安全食品。" },
+                    { text: "可以取消一切农业种植活动", isCorrect: false, rationale: "错误。都市农耕本身就是农业活动。" }
+                ],
+                hint: "适合空间狭小的都市家庭阳台或露台。"
+            },
+            {
+                stage: 4,
+                category: "单元4: 蓄水花盆结构",
+                question: "双层蓄水种植容器（Takungan）的下层空间主要是用来盛装什么的？",
+                options: [
+                    { text: "水或配制好的 AB 营养液", isCorrect: true, rationale: "正确！下层蓄水槽储存水分营养液，通过棉绳输送到上层供植物吸收。" },
+                    { text: "干燥的重泥土", isCorrect: false, rationale: "错误。下层是水槽，不放泥土。" },
+                    { text: "大块铁矿石", isCorrect: false, rationale: "错误。铁矿石无法供植物吸收。" },
+                    { text: "废旧塑料袋", isCorrect: false, rationale: "错误。废塑料对水分无补充作用。" }
+                ],
+                hint: "下层用于储水，减少每天浇水的麻烦。"
+            },
+            {
+                stage: 4,
+                category: "单元4: 幼苗移植",
+                question: "播种在海绵上的菜苗，通常要在什么时候移植到水培槽或种植花盆中最合适？",
+                options: [
+                    { text: "幼苗长出 2 至 4 片真叶且根系健全时", isCorrect: true, rationale: "正确！此时幼苗光合作用能力与根系吸收能力已增强，移植存活率高。" },
+                    { text: "刚放入种子 5 分钟时", isCorrect: false, rationale: "错误。种子尚未发芽。" },
+                    { text: "植物开花结出果实后", isCorrect: false, rationale: "错误。开花结果期已是成熟后期。" },
+                    { text: "海绵完全干枯变黑后", isCorrect: false, rationale: "错误。海绵干枯幼苗已被晒死。" }
+                ],
+                hint: "当小苗长出好几片绿色小叶子的时候。"
+            },
+            {
+                stage: 4,
+                category: "单元4: 水肥稀释安全",
+                question: "配制 AB 浓缩营养液时，为什么不能将浓缩原液直接倒在蔬菜根部？",
+                options: [
+                    { text: "原液浓度过高会导致根部脱水（烧根）致死", isCorrect: true, rationale: "正确！高浓度盐分溶液会导致渗透压反转，使植物根部水分倒流而干枯。" },
+                    { text: "因为原液会变成固体石头", isCorrect: false, rationale: "错误。原液不会变成石头。" },
+                    { text: "因为原液会散发毒气", isCorrect: false, rationale: "错误。营养液本身无毒。" },
+                    { text: "因为植物根部只吸收纯油", isCorrect: false, rationale: "错误。植物不吸收油脂。" }
+                ],
+                hint: "浓缩肥料浓度太高，会把蔬菜根部“咸死/烧死”。"
+            },
+            {
+                stage: 4,
+                category: "单元4: 植物养护环境",
+                question: "无土栽培的蔬菜种植槽应该摆放在环境中的什么位置最有利于蔬菜生长？",
+                options: [
+                    { text: "阳光充足且通风良好的地方", isCorrect: true, rationale: "正确！充足的光照是进行光合作用的基础，通风良好可减少病虫害与根部腐烂。" },
+                    { text: "完全黑暗的阴冷地下室", isCorrect: false, rationale: "错误。无光植物无法进行光合作用会黄化死亡。" },
+                    { text: "紧挨着高温厨房灶台", isCorrect: false, rationale: "错误。高温油烟会烫死蔬菜。" },
+                    { text: "封闭无风的衣柜内部", isCorrect: false, rationale: "错误。缺乏光照与空气流动。" }
+                ],
+                hint: "植物需要充足的光照做光合作用。"
+            },
+            {
+                stage: 4,
+                category: "单元4: 栽培介质对比",
+                question: "无土栽培中使用泥炭土（Peat Moss）或椰糠（Cocopeat）代替普通土壤的主要优点是什么？",
+                options: [
+                    { text: "质地轻盈、保水透气性好且无杂草种子与病原菌", isCorrect: true, rationale: "正确！泥炭土与椰糠无菌干净且理化性质优良，非常适合都市室内种植。" },
+                    { text: "完全不需要浇水", isCorrect: false, rationale: "错误。这些介质依然需要吸收水分。" },
+                    { text: "能永久自动发光", isCorrect: false, rationale: "错误。介质不会发光。" },
+                    { text: "可以让植物一小时内长大", isCorrect: false, rationale: "错误。植物生长依然遵循自然规律。" }
+                ],
+                hint: "干净轻便，没有土壤里乱七八糟的虫卵和杂草籽。"
+            },
+            {
+                stage: 4,
+                category: "单元4: 水质维护",
+                question: "水培蓄水槽里的水如果长时间不更换，发黄变臭并长满青苔，正确的处理方法是：",
+                options: [
+                    { text: "倒掉旧水并清洗水槽，重新注入清水并按比例配制营养液", isCorrect: true, rationale: "正确！定期清理水槽并更换新鲜水肥能防止根部缺氧腐烂。" },
+                    { text: "往里面倒食盐消毒", isCorrect: false, rationale: "错误。高盐度会杀死植物。" },
+                    { text: "加入杀虫剂继续使用", isCorrect: false, rationale: "错误。杀虫剂污染水质且有毒。" },
+                    { text: "用黑布盖住不管不顾", isCorrect: false, rationale: "错误。无法解决根部腐烂与水质恶化问题。" }
+                ],
+                hint: "清空脏水，把槽洗干净换上新鲜营养水。"
+            },
+            {
+                stage: 4,
+                category: "单元4: 芯吸棉绳选择",
+                question: "芯吸系统中，用来做芯吸传导材料的棉绳，最关键的材质特性要求是什么？",
+                options: [
+                    { text: "必须具有良好的吸水性和渗透性（如纯棉绳）", isCorrect: true, rationale: "正确！纯棉或亲水性好的纤维才能有效通过毛细现象向上输送液体。" },
+                    { text: "必须是完全不吸水的塑料绳", isCorrect: false, rationale: "错误。疏水塑料绳无法吸收输送水分。" },
+                    { text: "必须是高压铜导线", isCorrect: false, rationale: "错误。金属铜线吸水性极差。" },
+                    { text: "必须是用玻璃做的硬棒", isCorrect: false, rationale: "错误。玻璃棒没有吸水毛细结构。" }
+                ],
+                hint: "要像棉花吸水纸一样能把水吸上去。"
+            },
+            {
+                stage: 4,
+                category: "单元4: 播种深度",
+                question: "在湿润的海绵切口中播入菜籽时，播种深度控制在多少最合适？",
+                options: [
+                    { text: "约 0.5 cm 至 1 cm 左右，不能塞得太深", isCorrect: true, rationale: "正确！浅播便于种子呼吸和嫩芽破土发芽，塞太深容易导致无氧闷烂。" },
+                    { text: "塞入海绵底部最深处 10 cm", isCorrect: false, rationale: "错误。太深缺乏氧气且嫩芽无法钻出。" },
+                    { text: "直接丢在离海绵 1 米外", isCorrect: false, rationale: "错误。种子吸收不到水分。" },
+                    { text: "用铁锤打入海绵核心", isCorrect: false, rationale: "错误。会破坏种子胚芽结构。" }
+                ],
+                hint: "轻轻塞入小切口，既能保湿又能让芽破土。"
+            },
+            {
+                stage: 4,
+                category: "单元4: 日常护理",
+                question: "在水培蔬菜生长的日常护理中，下列哪项属于每天或每周必须进行的检查项目？",
+                options: [
+                    { text: "检查蓄水槽水位，补充稀释好的营养液", isCorrect: true, rationale: "正确！保证充足的水分与养分供给是水培蔬菜健康生长的关键。" },
+                    { text: "给菜叶涂抹油漆美化", isCorrect: false, rationale: "错误。涂油漆堵塞气孔会杀死植物。" },
+                    { text: "每天用剪刀把菜叶全部剪光", isCorrect: false, rationale: "错误。剪光叶片植物无法进行光合作用。" },
+                    { text: "把种植槽移入冰柜冷冻", isCorrect: false, rationale: "错误。冰冻会冻伤植物细胞。" }
+                ],
+                hint: "观察水槽里还有没有水和营养液。"
+            },
+            {
+                stage: 4,
+                category: "单元4: 病虫害防治",
+                question: "都市农耕种植过程中，如果发现少数叶片上有害虫危害，最环保无毒的处理方式是：",
+                options: [
+                    { text: "人工抓除害虫，或喷洒稀释的自制苦楝油/辣椒水", isCorrect: true, rationale: "正确！家庭都市农耕提倡无毒环保，人工抓除或生物驱虫最安全。" },
+                    { text: "喷洒大量剧毒农药", isCorrect: false, rationale: "错误。农药残留会危害家庭食用安全。" },
+                    { text: "用火烧毁整个阳台", isCorrect: false, rationale: "错误。极度危险且破坏房屋。" },
+                    { text: "不予理睬任由害虫吃光", isCorrect: false, rationale: "错误。会导致作物绝收。" }
+                ],
+                hint: "手拿抓掉或用天然无毒的辣椒水喷洒驱虫。"
+            },
+            {
+                stage: 4,
+                category: "单元4: 采收标准",
+                question: "水培小白菜或叶菜类成熟时，最理想的采收（Harvesting）方法是：",
+                options: [
+                    { text: "连根轻轻拔起或从基部用剪刀整齐剪下", isCorrect: true, rationale: "正确！整齐采收可保持菜株完整清洁，便于清洗食用。" },
+                    { text: "用脚踩烂菜叶", isCorrect: false, rationale: "错误。破坏蔬菜无法食用。" },
+                    { text: "用强酸溶解根部", isCorrect: false, rationale: "错误。产生剧毒破坏食物。" },
+                    { text: "提前在种子刚发芽时采收", isCorrect: false, rationale: "错误。幼苗产量极低尚未成熟。" }
+                ],
+                hint: "干净整洁地从基部剪断或整株拔起。"
+            }
+        ];
+
+        // Game State
+        let gameState = {
+            mode: 'stages',
+            currentStage: 1,
+            questions: [],
+            currentIndex: 0,
+            score: 0,
+            lives: 3,
+            combo: 0,
+            maxCombo: 0,
+            correctCount: 0,
+            timer: null,
+            timeLeft: 20,
+            mistakes: JSON.parse(localStorage.getItem('rbt_mistakes') || '[]'),
+            stageProgress: JSON.parse(localStorage.getItem('rbt_stage_progress') || '{}')
+        };
+
+        const stagesMeta = [
+            { id: 1, title: "单元一：一针一线的温暖", icon: "🧵", color: "from-pink-500 to-rose-600", desc: "掌握基本缝纫工具、手缝针法与物品缝制流程" },
+            { id: 2, title: "单元二：无限的可更新能源", icon: "☀️", color: "from-amber-500 to-orange-600", desc: "认识太阳能、风能、水力与生物质，了解太阳能电池板与马达应用" },
+            { id: 3, title: "单元三：程序设计与微型控制器", icon: "🤖", color: "from-blue-500 to-indigo-600", desc: "学习算法、流程图、微型控制器输入输出与三维草图设计" },
+            { id: 4, title: "单元四：绿意生机与都市农耕", icon: "🌱", color: "from-emerald-500 to-teal-600", desc: "了解蓄水种植系统、棉绳毛细现象与 AB 营养液" }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDashboardStats();
+            renderStagesList();
+            updateMistakeCount();
+            initCloudStorage();
+        });
+
+        function showScreen(screenId) {
+            playSound('click');
+            ['startScreen', 'stagesScreen', 'quizScreen', 'resultScreen', 'mistakesScreen'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+
+            if (screenId === 'startScreen') {
+                updateDashboardStats();
+            } else if (screenId === 'mistakesScreen') {
+                renderMistakes();
+            }
+        }
+
+        function updateDashboardStats() {
+            const completed = Object.keys(gameState.stageProgress).length;
+            document.getElementById('statCompleted').innerText = `${completed}/4`;
+            
+            let totalStars = 0;
+            Object.values(gameState.stageProgress).forEach(p => totalStars += (p.stars || 0));
+            document.getElementById('statStars').innerText = totalStars;
+
+            const totalScore = localStorage.getItem('rbt_total_score') || '0';
+            document.getElementById('totalScore').innerText = `得分: ${totalScore}`;
+        }
+
+        function renderStagesList() {
+            const container = document.getElementById('stageListContainer');
+            container.innerHTML = '';
+
+            stagesMeta.forEach(st => {
+                const prog = gameState.stageProgress[st.id] || { stars: 0, score: 0 };
+                let starsHtml = '';
+                for (let i = 1; i <= 3; i++) {
+                    if (i <= prog.stars) {
+                        starsHtml += '<i class="fas fa-star text-amber-400"></i>';
+                    } else {
+                        starsHtml += '<i class="far fa-star text-slate-600"></i>';
+                    }
+                }
+
+                const card = document.createElement('div');
+                card.className = "btn-bounce bg-slate-800/80 p-5 rounded-2xl border border-slate-700/80 flex items-center justify-between cursor-pointer";
+                card.onclick = () => startStageQuiz(st.id);
+                card.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br ${st.color} flex items-center justify-center text-2xl shadow-lg">
+                            ${st.icon}
+                        </div>
+                        <div class="space-y-1">
+                            <h3 class="text-base font-bold text-white">${st.title}</h3>
+                            <p class="text-xs text-slate-400 max-w-md">${st.desc}</p>
+                            <div class="flex items-center space-x-2 pt-1 text-xs">
+                                <span class="text-amber-300 space-x-0.5">${starsHtml}</span>
+                                <span class="text-slate-500">| 最高分: ${prog.score}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-slate-700/60 flex items-center justify-center text-indigo-400">
+                        <i class="fas fa-play"></i>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function startMode(mode) {
+            gameState.mode = mode;
+            if (mode === 'stages') {
+                showScreen('stagesScreen');
+            } else if (mode === 'challenge') {
+                startChallengeQuiz();
+            }
+        }
+
+        function startStageQuiz(stageId) {
+            gameState.currentStage = stageId;
+            // 挑选该单元所有的独立题目并随机打乱取10题
+            const stagePool = unique60QuestionBank.filter(q => q.stage === stageId);
+            gameState.questions = [...stagePool].sort(() => Math.random() - 0.5).slice(0, 10);
+            resetQuizState();
+            showScreen('quizScreen');
+            loadQuestion();
+        }
+
+        function startChallengeQuiz() {
+            gameState.currentStage = '60题全能通关大挑战';
+            // 全部 60 道无重复题目随机排序
+            gameState.questions = [...unique60QuestionBank].sort(() => Math.random() - 0.5);
+            resetQuizState();
+            showScreen('quizScreen');
+            loadQuestion();
+        }
+
+        function resetQuizState() {
+            gameState.currentIndex = 0;
+            gameState.score = 0;
+            gameState.lives = gameState.mode === 'challenge' ? 3 : 99;
+            gameState.combo = 0;
+            gameState.maxCombo = 0;
+            gameState.correctCount = 0;
+            updateLivesUI();
+        }
+
+        function updateLivesUI() {
+            const container = document.getElementById('livesContainer');
+            if (gameState.mode === 'challenge') {
+                container.classList.remove('hidden');
+                let hearts = '';
+                for (let i = 0; i < 3; i++) {
+                    if (i < gameState.lives) {
+                        hearts += '<i class="fas fa-heart text-rose-500"></i>';
+                    } else {
+                        hearts += '<i class="far fa-heart text-slate-600"></i>';
+                    }
+                }
+                container.innerHTML = hearts;
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        function loadQuestion() {
+            clearInterval(gameState.timer);
+            document.getElementById('explanationDrawer').classList.add('hidden');
+
+            if (gameState.currentIndex >= gameState.questions.length || gameState.lives <= 0) {
+                finishQuiz();
+                return;
+            }
+
+            const q = gameState.questions[gameState.currentIndex];
+
+            document.getElementById('quizStageBadge').innerText = typeof gameState.currentStage === 'number' ? `单元 ${gameState.currentStage}` : '60题大挑战';
+            document.getElementById('quizProgressText').innerText = `第 ${gameState.currentIndex + 1} / ${gameState.questions.length} 题`;
+            document.getElementById('questionCategory').innerText = q.category;
+            document.getElementById('questionText').innerText = q.question;
+            document.getElementById('comboCounter').innerText = gameState.combo;
+
+            const prog = ((gameState.currentIndex) / gameState.questions.length) * 100;
+            document.getElementById('progressBar').style.width = `${prog}%`;
+
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+
+            // 打乱选项顺序
+            const opts = [...q.options].sort(() => Math.random() - 0.5);
+
+            opts.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-2xl bg-slate-800/90 hover:bg-slate-700/90 border border-slate-700/80 text-white font-medium text-sm transition flex items-center justify-between group btn-bounce option-btn";
+                btn.dataset.isCorrect = opt.isCorrect ? "true" : "false";
+                btn.onclick = () => selectAnswer(btn, opt, q);
+                btn.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="w-8 h-8 rounded-xl bg-slate-700/80 group-hover:bg-indigo-600 text-slate-300 group-hover:text-white flex items-center justify-center font-bold text-xs transition">
+                            ${String.fromCharCode(65 + idx)}
+                        </span>
+                        <span>${opt.text}</span>
+                    </div>
+                    <i class="fas fa-circle-notch opacity-0 group-hover:opacity-100 text-indigo-400"></i>
+                `;
+                container.appendChild(btn);
+            });
+
+            startTimer(20);
+        }
+
+        function startTimer(seconds) {
+            gameState.timeLeft = seconds;
+            document.getElementById('timerText').innerText = `${gameState.timeLeft}秒`;
+
+            gameState.timer = setInterval(() => {
+                gameState.timeLeft--;
+                document.getElementById('timerText').innerText = `${gameState.timeLeft}秒`;
+
+                if (gameState.timeLeft <= 0) {
+                    clearInterval(gameState.timer);
+                    timeOutAnswer();
+                }
+            }, 1000);
+        }
+
+        function selectAnswer(selectedBtn, selectedOpt, questionObj) {
+            clearInterval(gameState.timer);
+
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(btn => {
+                btn.onclick = null;
+                btn.classList.remove('btn-bounce');
+                btn.classList.add('opacity-60');
+            });
+
+            const isCorrect = selectedOpt.isCorrect;
+
+            if (isCorrect) {
+                playSound('correct');
+                selectedBtn.classList.remove('opacity-60', 'bg-slate-800/90');
+                selectedBtn.classList.add('bg-emerald-600/90', 'border-emerald-400', 'text-white');
+                
+                gameState.score += 100 + (gameState.combo * 10);
+                gameState.combo++;
+                if (gameState.combo > gameState.maxCombo) gameState.maxCombo = gameState.combo;
+                gameState.correctCount++;
+
+                showExplanation(true, selectedOpt.rationale);
+            } else {
+                playSound('wrong');
+                selectedBtn.classList.remove('opacity-60', 'bg-slate-800/90');
+                selectedBtn.classList.add('bg-rose-600/90', 'border-rose-400', 'text-white');
+
+                buttons.forEach(btn => {
+                    if (btn.dataset.isCorrect === "true") {
+                        btn.classList.remove('opacity-60');
+                        btn.classList.add('bg-emerald-600/90', 'border-emerald-400', 'text-white');
+                    }
+                });
+
+                gameState.combo = 0;
+                if (gameState.mode === 'challenge') {
+                    gameState.lives--;
+                    updateLivesUI();
+                }
+
+                saveMistake(questionObj);
+                showExplanation(false, selectedOpt.rationale);
+            }
+        }
+
+        function timeOutAnswer() {
+            playSound('wrong');
+            const q = gameState.questions[gameState.currentIndex];
+            gameState.combo = 0;
+            if (gameState.mode === 'challenge') {
+                gameState.lives--;
+                updateLivesUI();
+            }
+
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(btn => {
+                btn.onclick = null;
+                if (btn.dataset.isCorrect === "true") {
+                    btn.classList.remove('opacity-60');
+                    btn.classList.add('bg-emerald-600/90', 'border-emerald-400', 'text-white');
+                }
+            });
+
+            saveMistake(q);
+            const correctOpt = q.options.find(o => o.isCorrect);
+            showExplanation(false, `时间到！${correctOpt.rationale}`);
+        }
+
+        function showExplanation(isCorrect, rationale) {
+            const drawer = document.getElementById('explanationDrawer');
+            const title = document.getElementById('explanationTitle');
+            const text = document.getElementById('explanationText');
+
+            drawer.classList.remove('hidden');
+
+            if (isCorrect) {
+                title.className = "flex items-center space-x-2 font-bold text-emerald-400";
+                title.innerHTML = `<i class="fas fa-check-circle"></i> <span>回答正确！(+${100 + (gameState.combo - 1) * 10}分)</span>`;
+            } else {
+                title.className = "flex items-center space-x-2 font-bold text-rose-400";
+                title.innerHTML = `<i class="fas fa-times-circle"></i> <span>回答错误 / 超时</span>`;
+            }
+
+            text.innerText = rationale;
+        }
+
+        function nextQuestion() {
+            playSound('click');
+            gameState.currentIndex++;
+            loadQuestion();
+        }
+
+        function useHint() {
+            playSound('click');
+            const q = gameState.questions[gameState.currentIndex];
+            showCustomModal({
+                icon: '💡',
+                title: '解题提示',
+                message: q.hint
+            });
+            gameState.score = Math.max(0, gameState.score - 30);
+        }
+
+        function saveMistake(q) {
+            if (!gameState.mistakes.some(m => m.question === q.question)) {
+                gameState.mistakes.push(q);
+                updateMistakeCount();
+                saveToCloud();
+            }
+        }
+
+        function updateMistakeCount() {
+            document.getElementById('mistakeCount').innerText = gameState.mistakes.length;
+        }
+
+        function finishQuiz() {
+            const totalQ = gameState.questions.length;
+            const accuracy = Math.round((gameState.correctCount / Math.max(1, gameState.currentIndex)) * 100);
+
+            let stars = 1;
+            if (accuracy >= 80) stars = 3;
+            else if (accuracy >= 60) stars = 2;
+
+            if (typeof gameState.currentStage === 'number') {
+                const prevStage = gameState.stageProgress[gameState.currentStage] || { score: 0, stars: 0 };
+                gameState.stageProgress[gameState.currentStage] = {
+                    score: Math.max(prevStage.score, gameState.score),
+                    stars: Math.max(prevStage.stars, stars)
+                };
+            }
+
+            const accumulatedScore = (parseInt(localStorage.getItem('rbt_total_score') || '0')) + gameState.score;
+            localStorage.setItem('rbt_total_score', accumulatedScore.toString());
+
+            saveToCloud();
+
+            document.getElementById('resScore').innerText = gameState.score;
+            document.getElementById('resAccuracy').innerText = `${accuracy}%`;
+            document.getElementById('resCombo').innerText = `${gameState.maxCombo}连胜`;
+
+            const starsContainer = document.getElementById('resultStars');
+            let starsHtml = '';
+            for (let i = 1; i <= 3; i++) {
+                if (i <= stars) starsHtml += '<i class="fas fa-star text-amber-400"></i>';
+                else starsHtml += '<i class="far fa-star text-slate-600"></i>';
+            }
+            starsContainer.innerHTML = starsHtml;
+
+            if (accuracy >= 60) {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }
+
+            showScreen('resultScreen');
+        }
+
+        function restartCurrentQuiz() {
+            if (typeof gameState.currentStage === 'number') {
+                startStageQuiz(gameState.currentStage);
+            } else {
+                startChallengeQuiz();
+            }
+        }
+
+        function renderMistakes() {
+            const container = document.getElementById('mistakesList');
+            container.innerHTML = '';
+
+            if (gameState.mistakes.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-slate-400 space-y-2">
+                        <i class="fas fa-check-double text-3xl text-emerald-400"></i>
+                        <p>太棒了！目前没有任何错题记录！</p>
+                    </div>
+                `;
+                return;
+            }
+
+            gameState.mistakes.forEach((m, idx) => {
+                const correctOption = m.options.find(o => o.isCorrect);
+                const item = document.createElement('div');
+                item.className = "bg-slate-900/80 p-4 rounded-2xl border border-slate-800 space-y-2";
+                item.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs px-2.5 py-1 rounded-lg bg-indigo-950 text-indigo-300 border border-indigo-800">${m.category}</span>
+                        <button onclick="removeMistake(${idx})" class="text-xs text-rose-400 hover:text-rose-300">
+                            <i class="fas fa-trash"></i> 移除
+                        </button>
+                    </div>
+                    <h4 class="text-sm font-bold text-white">${m.question}</h4>
+                    <div class="text-xs text-emerald-400 bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-800/40">
+                        🔑 正确答案: ${correctOption.text}
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">${correctOption.rationale}</p>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function removeMistake(index) {
+            gameState.mistakes.splice(index, 1);
+            updateMistakeCount();
+            renderMistakes();
+            saveToCloud();
+        }
+
+        function resetProgress() {
+            showCustomModal({
+                icon: '⚠️',
+                title: '重置所有进度',
+                message: '确定要重置通关进度、得分和错题本吗？此操作无法撤销。',
+                confirmText: '确认重置',
+                cancelText: '取消',
+                onConfirm: async () => {
+                    localStorage.removeItem('rbt_stage_progress');
+                    localStorage.removeItem('rbt_total_score');
+                    localStorage.removeItem('rbt_mistakes');
+                    gameState.stageProgress = {};
+                    gameState.mistakes = [];
+
+                    await saveToCloud();
+
+                    updateDashboardStats();
+                    renderStagesList();
+                    updateMistakeCount();
+
+                    showCustomModal({
+                        icon: '✅',
+                        title: '重置完成',
+                        message: '游戏进度已成功清空。'
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>
